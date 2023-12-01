@@ -1,0 +1,6 @@
+{
+  "token": "your_token",
+  "counter_type": "Sympathies",
+  "message_text": "[CENTER]❄ Мне поставили {counter} симпатий ❄\n\nСделано благодаря: https://zelenka.guru/threads/6203202/[/CENTER]",
+  "message_id": 3327465
+}
