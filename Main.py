@@ -1,7 +1,15 @@
 import httpx
 import time
-from enum import Enum
 import json
+import logging
+import sys
+
+
+from enum import Enum
+from httpx import Response
+
+#Логирование, зачем вы сюда залезли?
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | counter.unitoshka.fun | %(levelname)s | %(message)s")
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json.load(f)
@@ -10,6 +18,7 @@ with open('config.json', 'r', encoding='utf8') as f:
 class CounterType(Enum):
     Sympathies = 'user_like_count'
     User_Messages = 'user_message_count'
+
 
 
 class Counter():
@@ -29,6 +38,11 @@ class Counter():
     def get_profile(self) -> dict:
         with httpx.Client(headers=self.headers) as client:
             request = client.get(url=f'{self.baseUrl}/users/me')
+
+            if request.json().get('error'):
+                logging.critical('Ваш токен невалиден')
+                sys.exit()
+
         return request.json()
 
     def get_list(self, counter_type: CounterType) -> list[int]:
@@ -49,8 +63,26 @@ class Counter():
 
 class Updater():
     @staticmethod
-    def get_updates() -> None:
-        pass
+    def get_version() -> int | float | None:
+        try:
+            with open('version.txt', 'r') as file:
+                return float(file.read())
+        except IOError:
+            return None
+
+    @staticmethod
+    def get_update() -> None:
+        version = Updater.get_version()
+
+        if isinstance(version, (float, int)):
+            actual_version = float(httpx.get(url='https://raw.githubusercontent.com/Unitoshka/CounterZelenka/master/version.txt').text)
+
+            if version < actual_version:
+                logging.warning('Обновите свою версию на https://github.com/Unitoshka/CounterZelenka/tree/master')
+                return
+            logging.info('У вас актуальная версия Counter.unitoshka.fun')
+            return
+        logging.error('У вас отсутствует файл version.txt, создайте его чтобы получать обновления')
 
 
 
@@ -58,6 +90,9 @@ if __name__ == '__main__':
     counter = Counter(token=config['token'])
 
     counter_type = CounterType[config['counter_type']]
+    logging.info('Программа запущена')
+
+    Updater.get_update()
 
     while True:
         list_ = counter.get_list(counter_type=counter_type)
@@ -69,6 +104,6 @@ if __name__ == '__main__':
         time.sleep(10)
 
         counter.edit_message(message_id=config['message_id'], post_body=message)
-        print('Counter.Unitoshka.fun -- Сообщение было изменено')
+        logging.info('Сообщение было заменено')
 
         time.sleep(10)
