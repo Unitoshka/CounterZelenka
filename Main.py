@@ -56,8 +56,10 @@ class Counter():
     def list_to_counter(split: list[int]) -> list[str]:
         counter_list: list[str] = []
 
+        file_format = 'gif' if 'gif' in config['theme'] else 'png' # Говнокодик)
+
         for number in split:
-            counter_list.append(f'[IMG]https://counter.unitoshka.fun/girls/{number}.png[/IMG]')
+            counter_list.append(f'[IMG]https://counter.unitoshka.fun/themes/{config["theme"]}/{number}.{file_format}[/IMG]')
 
         return counter_list
 
@@ -80,7 +82,7 @@ class Updater():
             if version < actual_version:
                 logging.warning('Обновите свою версию на https://github.com/Unitoshka/CounterZelenka/tree/master')
                 return
-            logging.info('У вас актуальная версия Counter.unitoshka.fun')
+            logging.info('У вас актуальная версия counter.unitoshka.fun')
             return
         logging.error('У вас отсутствует файл version.txt, создайте его чтобы получать обновления')
 
