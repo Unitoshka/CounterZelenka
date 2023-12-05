@@ -59,7 +59,7 @@ class Counter():
         file_format = 'gif' if 'gif' in config['theme'] else 'png' # Говнокодик)
 
         for number in split:
-            counter_list.append(f'[IMG]https://counter.unitoshka.fun/themes/{config["theme"]}/{number}.{file_format}[/IMG]')
+            counter_list.append(f'[IMG={config["attributes"]}]https://counter.unitoshka.fun/themes/{config["theme"]}/{number}.{file_format}[/IMG]')
 
         return counter_list
 
